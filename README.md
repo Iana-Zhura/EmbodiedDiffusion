@@ -16,15 +16,6 @@ index.html   self-contained project page (single file, no build step, no depende
 .nojekyll    tells GitHub Pages to serve files as-is
 ```
 
-## Deploying to GitHub Pages
-
-1. Upload `index.html` and `.nojekyll` to this repository's root (drag-and-drop on
-   GitHub, or `git add -A && git commit -m "project page" && git push`). `.nojekyll`
-   is hidden on macOS/Linux — reveal it with `Cmd/Ctrl+Shift+.` in the file picker.
-2. In the repo: **Settings → Pages** → *Build and deployment* → **Source: Deploy from
-   a branch**, **Branch: main**, **Folder: / (root)** → Save.
-3. Wait ~1 minute, then reload the Settings → Pages screen for the live URL.
-
 ## Citation
 
 ```bibtex
