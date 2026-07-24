@@ -330,6 +330,38 @@ a:hover { text-decoration: underline; }
   position: relative;
   padding: clamp(48px, 10vw, 110px) 0 clamp(32px, 6vw, 56px);
   text-align: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Animated diffusion background — dark theme shows the original,
+   light theme flips it with `filter: invert(1)` so the bg becomes light */
+.hero-bg-anim {
+  position: absolute;
+  inset: 0;
+  background: url('images/diffusion-bg.gif') center / cover no-repeat;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: -2;
+  transition: opacity 0.4s, filter 0.4s;
+}
+/* Soft vignette so the animation fades out at the edges,
+   keeping the text crisp in the center */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 65% 55% at center,
+      transparent 0%,
+      transparent 35%,
+      var(--bg-0) 80%);
+}
+/* Light theme: flip the GIF so the dark navy background becomes light */
+:root[data-theme="light"] .hero-bg-anim {
+  filter: invert(1) hue-rotate(180deg);
+  opacity: 0.35;
 }
 .hero-badge {
   display: inline-flex;
