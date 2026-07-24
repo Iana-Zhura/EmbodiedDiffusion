@@ -32,6 +32,12 @@
       var param = new URLSearchParams(window.location.search).get('theme');
       if (param === 'light' || param === 'dark') {
         localStorage.setItem('theme', param);
+        localStorage.setItem('themeV', '2');
+      }
+      // One-time reset: bump version to force new default for returning users
+      if (localStorage.getItem('themeV') !== '2') {
+        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('themeV', '2');
       }
       var t = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', t);

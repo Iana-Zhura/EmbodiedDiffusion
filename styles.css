@@ -997,6 +997,9 @@ table.results .num { font-variant-numeric: tabular-nums; }
     transition-duration: 0.01ms !important;
   }
   .reveal { opacity: 1; transform: none; }
+  /* Pause the hero background animation for users who prefer reduced motion */
+  .hero-video, .hero-particles .particle { animation-play-state: paused !important; }
+  .hero-particles .particle { display: none; }
 }
 
 /* ---------- Narrow phones ---------- */
