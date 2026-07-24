@@ -240,30 +240,40 @@ a:hover { text-decoration: underline; }
   line-height: 1;
 }
 
-/* Nav action group (theme toggle + burger) */
+/* Nav action group (theme toggle + burger) — share the arXiv button design */
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 .icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  padding: 8px 10px;
   border-radius: 10px;
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--text-dim);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  color: #1a1a2e;
   cursor: pointer;
   transition: all 0.2s;
 }
 .icon-btn:hover {
-  background: var(--btn-hover-bg);
-  color: var(--text);
-  border-color: var(--line-2);
+  background: #f7f7f7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 0, 0, 0.18);
+}
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.icon-btn.active {
+  background: #f0f0f0;
+  border-color: rgba(0, 0, 0, 0.22);
 }
 .theme-toggle .icon-sun { display: none; }
 .theme-toggle .icon-moon { display: block; }
@@ -864,7 +874,7 @@ table.results .num { font-variant-numeric: tabular-nums; }
 /* ---------- Footer ---------- */
 .footer {
   border-top: 1px solid var(--line);
-  padding: 40px 0 60px;
+  padding: 48px 0 60px;
   margin-top: 40px;
   text-align: center;
 }
@@ -887,6 +897,10 @@ table.results .num { font-variant-numeric: tabular-nums; }
   margin: 8px 0 16px;
   color: var(--text);
 }
+.footer-lab a { color: var(--text); text-decoration: none; }
+.footer-lab a:hover { text-decoration: underline; }
+.lab-sep { color: var(--text-mute); margin: 0 2px; }
+.lab a { color: var(--accent-2); }
 
 /* ---------- Reveal animation ---------- */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s, transform 0.8s; }
@@ -908,5 +922,6 @@ table.results .num { font-variant-numeric: tabular-nums; }
   .resource-card { padding: 22px 18px; }
   .hero { padding-top: 32px; }
   .btn { padding: 11px 16px; font-size: 13.5px; }
-  .icon-btn { width: 36px; height: 36px; }
+  .icon-btn { padding: 7px 9px; }
+  .icon-btn svg { width: 17px; height: 17px; }
 }
