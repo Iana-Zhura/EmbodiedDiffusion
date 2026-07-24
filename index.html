@@ -32,14 +32,14 @@
       var param = new URLSearchParams(window.location.search).get('theme');
       if (param === 'light' || param === 'dark') {
         localStorage.setItem('theme', param);
-        localStorage.setItem('themeV', '2');
+        localStorage.setItem('themeV', '3');
       }
       // One-time reset: bump version to force new default for returning users
-      if (localStorage.getItem('themeV') !== '2') {
-        localStorage.setItem('theme', 'dark');
-        localStorage.setItem('themeV', '2');
+      if (localStorage.getItem('themeV') !== '3') {
+        localStorage.setItem('theme', 'light');
+        localStorage.setItem('themeV', '3');
       }
-      var t = localStorage.getItem('theme') || 'dark';
+      var t = localStorage.getItem('theme') || 'light';
       document.documentElement.setAttribute('data-theme', t);
     } catch (e) {}
   })();
@@ -50,6 +50,16 @@
 <!-- ===== Nav ===== -->
 <nav class="nav" aria-label="Primary">
   <div class="container nav-inner">
+    <a href="https://www.skoltech.ru/en/" target="_blank" rel="noopener" class="nav-skoltech" aria-label="Skoltech">
+      <svg viewBox="0 0 240 48" role="img" aria-label="Skoltech" class="skoltech-svg">
+        <g font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="36" letter-spacing="-0.02em">
+          <text x="0" y="34" fill="currentColor">Sk</text>
+          <text x="50" y="34" fill="currentColor">oltech</text>
+          <circle cx="223" cy="11" r="4" fill="#E1251B"/>
+        </g>
+      </svg>
+    </a>
+    <span class="nav-divider" aria-hidden="true"></span>
     <a href="#top" class="brand">
       <span class="brand-mark">E</span>
       <span>EmbodiedDiffusion</span>
@@ -90,17 +100,24 @@
 
 <!-- ===== Hero ===== -->
 <header class="hero" id="top">
-  <!-- Animated diffusion background — video for both themes -->
+  <!-- Animated diffusion background — video for both themes.
+       Mobile (<=820px) gets the GIF instead (universal autoplay on iOS Safari).
+       Poster image shows first frame instantly while the video loads. -->
   <div class="hero-bg-anim" aria-hidden="true">
-    <video class="hero-video" autoplay loop muted playsinline preload="auto" id="bgVideo">
+    <video class="hero-video" autoplay loop muted playsinline preload="auto"
+           poster="images/diffusion-bg-poster.jpg" id="bgVideo">
       <source src="images/diffusion-bg.webm" type="video/webm">
       <source src="images/diffusion-bg.mp4" type="video/mp4">
-      <img src="images/diffusion-bg.gif" alt="">
     </video>
-    <video class="hero-video hero-video--light" autoplay loop muted playsinline preload="auto" id="bgVideoLight">
+    <video class="hero-video hero-video--light" autoplay loop muted playsinline preload="auto"
+           poster="images/diffusion-bg-light-poster.jpg" id="bgVideoLight">
       <source src="images/diffusion-bg-light.webm" type="video/webm">
       <source src="images/diffusion-bg-light.mp4" type="video/mp4">
     </video>
+    <!-- GIF fallbacks — used on mobile (CSS media query) and as the
+         ultimate fallback for browsers that can't play the video. -->
+    <img class="hero-gif" src="images/diffusion-bg.gif" alt="" id="bgGif">
+    <img class="hero-gif hero-gif--light" src="images/diffusion-bg-light.gif" alt="" id="bgGifLight">
   </div>
 
   <!-- Subtle particle drift overlay -->
@@ -664,6 +681,15 @@
     </p>
     <p class="reveal" style="margin-top: 16px; font-size: 12px;">
       arXiv:2512.02851 &middot; Code, dataset, and simulation environments will be released soon.
+    </p>
+    <p class="footer-contact reveal">
+      <a href="mailto:yana.zhura@skoltech.ru" class="footer-email">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Contact: <strong>yana.zhura@skoltech.ru</strong>
+      </a>
     </p>
   </div>
 </footer>
