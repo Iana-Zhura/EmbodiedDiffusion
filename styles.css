@@ -334,17 +334,74 @@ a:hover { text-decoration: underline; }
   isolation: isolate;
 }
 
-/* Animated diffusion background — dark theme shows the original,
-   light theme flips it with `filter: invert(1)` so the bg becomes light */
+/* Animated diffusion background — two <video> elements, one per theme.
+   Only one is visible at a time (controlled by [data-theme]). */
 .hero-bg-anim {
   position: absolute;
   inset: 0;
-  background: url('images/diffusion-bg.gif') center / cover no-repeat;
-  opacity: 0.45;
+  overflow: hidden;
   pointer-events: none;
   z-index: -2;
-  transition: opacity 0.4s, filter 0.4s;
 }
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  filter: brightness(1.25) saturate(1.3);
+}
+:root[data-theme="dark"] .hero-video:not(.hero-video--light) {
+  opacity: 0.9;
+}
+:root[data-theme="light"] .hero-video--light {
+  opacity: 0.75;
+}
+
+/* Subtle particle drift overlay */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+.hero-particles .particle {
+  position: absolute;
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  opacity: 0;
+  box-shadow: 0 0 8px var(--accent-2);
+  animation: particle-drift 18s linear infinite;
+}
+.hero-particles .particle:nth-child(1)  { left:  8%; top: 70%; animation-delay:  0s; animation-duration: 22s; }
+.hero-particles .particle:nth-child(2)  { left: 18%; top: 85%; animation-delay: -3s; animation-duration: 19s; }
+.hero-particles .particle:nth-child(3)  { left: 28%; top: 60%; animation-delay: -7s; animation-duration: 24s; }
+.hero-particles .particle:nth-child(4)  { left: 38%; top: 75%; animation-delay: -2s; animation-duration: 20s; }
+.hero-particles .particle:nth-child(5)  { left: 48%; top: 90%; animation-delay: -10s; animation-duration: 26s; }
+.hero-particles .particle:nth-child(6)  { left: 58%; top: 65%; animation-delay: -5s; animation-duration: 21s; }
+.hero-particles .particle:nth-child(7)  { left: 68%; top: 80%; animation-delay: -8s; animation-duration: 23s; }
+.hero-particles .particle:nth-child(8)  { left: 78%; top: 55%; animation-delay: -1s; animation-duration: 18s; }
+.hero-particles .particle:nth-child(9)  { left: 88%; top: 70%; animation-delay: -6s; animation-duration: 25s; }
+.hero-particles .particle:nth-child(10) { left: 95%; top: 85%; animation-delay: -4s; animation-duration: 20s; }
+@keyframes particle-drift {
+  0%   { transform: translate(0, 0) scale(1);    opacity: 0; }
+  10%  { opacity: 0.6; }
+  50%  { transform: translate(-30px, -200px) scale(0.7); opacity: 0.4; }
+  90%  { opacity: 0.2; }
+  100% { transform: translate(-80px, -400px) scale(0.4); opacity: 0; }
+}
+:root[data-theme="light"] .hero-particles .particle {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+  opacity: 0;
+}
+
 /* Soft vignette so the animation fades out at the edges,
    keeping the text crisp in the center */
 .hero-vignette {
@@ -353,15 +410,10 @@ a:hover { text-decoration: underline; }
   pointer-events: none;
   z-index: -1;
   background:
-    radial-gradient(ellipse 65% 55% at center,
+    radial-gradient(ellipse 80% 70% at center,
       transparent 0%,
-      transparent 35%,
-      var(--bg-0) 80%);
-}
-/* Light theme: flip the GIF so the dark navy background becomes light */
-:root[data-theme="light"] .hero-bg-anim {
-  filter: invert(1) hue-rotate(180deg);
-  opacity: 0.35;
+      transparent 50%,
+      var(--bg-0) 92%);
 }
 .hero-badge {
   display: inline-flex;

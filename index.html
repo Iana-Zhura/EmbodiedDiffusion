@@ -84,8 +84,36 @@
 
 <!-- ===== Hero ===== -->
 <header class="hero" id="top">
-  <div class="hero-bg-anim" aria-hidden="true"></div>
+  <!-- Animated diffusion background — video for both themes -->
+  <div class="hero-bg-anim" aria-hidden="true">
+    <video class="hero-video" autoplay loop muted playsinline preload="auto" id="bgVideo">
+      <source src="images/diffusion-bg.webm" type="video/webm">
+      <source src="images/diffusion-bg.mp4" type="video/mp4">
+      <img src="images/diffusion-bg.gif" alt="">
+    </video>
+    <video class="hero-video hero-video--light" autoplay loop muted playsinline preload="auto" id="bgVideoLight">
+      <source src="images/diffusion-bg-light.webm" type="video/webm">
+      <source src="images/diffusion-bg-light.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Subtle particle drift overlay -->
+  <div class="hero-particles" aria-hidden="true">
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+  </div>
+
+  <!-- Soft vignette so text stays readable -->
   <div class="hero-vignette" aria-hidden="true"></div>
+
   <div class="container">
     <div class="hero-badge reveal">
       <span class="dot"></span>
@@ -673,7 +701,27 @@
       const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
       root.setAttribute('data-theme', next);
       try { localStorage.setItem('theme', next); } catch (e) {}
+      // sync video playback so both are running
+      const other = document.getElementById(next === 'light' ? 'bgVideo' : 'bgVideoLight');
+      const cur   = document.getElementById(next === 'light' ? 'bgVideoLight' : 'bgVideo');
+      if (other && !other.paused) { try { other.currentTime = cur.currentTime; } catch (e) {} }
     });
+  })();
+
+  // Pause hero background videos when scrolled out of view (saves CPU + battery)
+  (function () {
+    const hero = document.querySelector('.hero');
+    const vids = [document.getElementById('bgVideo'), document.getElementById('bgVideoLight')].filter(Boolean);
+    if (!hero || !vids.length) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        vids.forEach(v => {
+          if (e.isIntersecting) { if (v.paused) v.play().catch(() => {}); }
+          else { v.pause(); }
+        });
+      });
+    }, { threshold: 0.05 });
+    io.observe(hero);
   })();
 
   // Mobile hamburger dropdown
