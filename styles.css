@@ -483,8 +483,32 @@ a:hover { text-decoration: underline; }
   font-size: 13px;
   color: var(--text);
   font-weight: 500;
-  margin-bottom: 28px;
+  margin-bottom: 12px;
 }
+
+/* Press mention — subtle link below the status badge */
+.hero-press {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  margin: 0 0 28px 8px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  text-decoration: none;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  transition: all 0.2s;
+}
+.hero-press:hover {
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--btn-hover-bg);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.hero-press strong { color: var(--accent-2); font-weight: 600; }
 .hero-badge .dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--accent-3);
