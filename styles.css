@@ -463,10 +463,14 @@ a:hover { text-decoration: underline; }
   pointer-events: none;
   z-index: -1;
   background:
-    radial-gradient(ellipse 80% 70% at center,
+    radial-gradient(ellipse 70% 60% at center,
+      transparent 0%,
+      transparent 30%,
+      var(--bg-0) 75%),
+    radial-gradient(ellipse 100% 100% at center,
       transparent 0%,
       transparent 50%,
-      var(--bg-0) 92%);
+      var(--bg-0) 95%);
 }
 .hero-badge {
   display: inline-flex;
@@ -512,10 +516,12 @@ a:hover { text-decoration: underline; }
 .hero-sub {
   font-size: clamp(15px, 1.6vw, 19px);
   line-height: 1.6;
-  color: var(--text-dim);
+  color: var(--text);
+  font-weight: 500;
   max-width: 760px;
   margin: 0 auto 32px;
 }
+:root[data-theme="light"] .hero-sub { color: #1a2540; }
 .authors {
   font-size: clamp(15px, 1.45vw, 18px);
   color: var(--text-dim);
@@ -531,9 +537,10 @@ a:hover { text-decoration: underline; }
 }
 .lab {
   font-size: 14px;
-  color: var(--text-mute);
+  color: var(--text-dim);
   margin: 0 auto 36px;
 }
+:root[data-theme="light"] .lab { color: #2a3550; }
 .lab a { color: var(--accent-2); }
 .cta-row {
   display: flex;
