@@ -206,6 +206,40 @@ a:hover { text-decoration: underline; }
 }
 .nav-cta:hover { transform: translateY(-1px); box-shadow: var(--shadow-2); text-decoration: none; }
 
+/* arXiv branded button — always white, works in both themes */
+.nav-cta-arxiv {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-cta-arxiv:hover {
+  background: #f7f7f7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(170, 20, 45, 0.20);
+  border-color: rgba(170, 20, 45, 0.30);
+  text-decoration: none;
+}
+.nav-cta-arxiv .arxiv-logo {
+  height: 20px;
+  width: auto;
+  display: block;
+}
+.nav-cta-arxiv .arxiv-ext {
+  color: #aa142d;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 /* Nav action group (theme toggle + burger) */
 .nav-actions {
   display: flex;
@@ -279,12 +313,6 @@ a:hover { text-decoration: underline; }
     font-size: 15px;
   }
   .nav-links a:not(.nav-cta):hover { background: var(--btn-hover-bg); }
-  .nav-links .nav-cta {
-    margin-top: 6px;
-    padding: 12px 14px;
-    justify-content: center;
-    font-size: 14.5px;
-  }
 }
 
 /* ---------- Hero ---------- */
@@ -441,7 +469,7 @@ a:hover { text-decoration: underline; }
 }
 /* Tighter cap on the teaser photo so it doesn't dominate the page */
 #teaser .figure-card {
-  max-width: 760px;
+  max-width: 600px;  /* ← tweak this number (e.g. 480 / 560 / 680) to taste */
   margin-left: auto;
   margin-right: auto;
 }

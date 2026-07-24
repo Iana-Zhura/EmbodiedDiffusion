@@ -28,8 +28,12 @@
 <script>
   (function () {
     try {
-      var t = localStorage.getItem('theme');
-      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      // URL param ?theme=light|dark forces a theme (overrides localStorage)
+      var param = new URLSearchParams(window.location.search).get('theme');
+      if (param === 'light' || param === 'dark') {
+        localStorage.setItem('theme', param);
+      }
+      var t = localStorage.getItem('theme') || 'light';
       document.documentElement.setAttribute('data-theme', t);
     } catch (e) {}
   })();
@@ -52,11 +56,12 @@
       <a href="#results">Results</a>
       <a href="#resources">Code &amp; Data</a>
       <a href="#cite">Cite</a>
-      <a class="nav-cta" href="https://arxiv.org/abs/2512.02851" target="_blank" rel="noopener">
-        arXiv ↗
-      </a>
     </div>
     <div class="nav-actions">
+      <a class="nav-cta-arxiv" href="https://arxiv.org/abs/2512.02851" target="_blank" rel="noopener" aria-label="Read on arXiv">
+        <img src="images/arxiv-logo.svg" alt="arXiv" class="arxiv-logo" />
+        <span class="arxiv-ext" aria-hidden="true">↗</span>
+      </a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
         <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="4"/>
@@ -621,7 +626,7 @@
       &copy; 2026 The Authors. Paper accepted to IEEE Robotics and Automation Letters.
     </p>
     <p class="reveal" style="margin-top: 16px; font-size: 12px;">
-      arXiv:2512.02851 &middot; Code, dataset, and simulation environments are releasing soon.
+      arXiv:2512.02851 &middot; Code, dataset, and simulation environments will be released soon.
     </p>
   </div>
 </footer>
