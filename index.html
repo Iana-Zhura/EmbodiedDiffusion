@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#07090f" />
+<title>EmbodiedDiffusion — End-to-End Traversability-Guided Visual Diffusion for Heterogeneous Robot Navigation | RA-L 2026</title>
+<meta name="description" content="EmbodiedDiffusion: a diffusion-based framework for unified traversability estimation and trajectory generation from a single RGB image, validated on quadruped and aerial robots. 90 ms inference, 80–100% success, ~10 min cross-platform adaptation. Accepted to IEEE RA-L 2026." />
+<meta name="author" content="Iana Zhura, Sausar Karaf, Faryal Batool, Nipun Dhananjaya Weerakkodi Mudalige, Valerii Serpiva, Ali Alridha Abdulkarim, Aleksey Fedoseev, Didar Seyidov, Hajira Amjad, Dzmitry Tsetserukou" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="EmbodiedDiffusion — RA-L 2026" />
+<meta property="og:description" content="End-to-End Traversability-Guided Visual Diffusion for Heterogeneous Robot Navigation. 90 ms inference, 80–100% navigation success, ~10 min cross-platform adaptation." />
+<meta property="og:image" content="images/teaser-web.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="EmbodiedDiffusion — RA-L 2026" />
+<meta name="twitter:description" content="Traversability + trajectory diffusion in one network, prompt-free at 90 ms." />
+<meta name="twitter:image" content="images/teaser-web.jpg" />
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%237c5cff'/%3E%3Cstop offset='100%25' stop-color='%232bd4ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='66' font-family='system-ui,sans-serif' font-size='56' font-weight='800' text-anchor='middle' fill='%2307090f'%3EE%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+
+<!-- Set theme before paint to avoid flash -->
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<nav class="nav" aria-label="Primary">
+  <div class="container nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark">E</span>
+      <span>EmbodiedDiffusion</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#teaser">Teaser</a>
+      <a href="#video">Video</a>
+      <a href="#highlights">Highlights</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#resources">Code &amp; Data</a>
+      <a href="#cite">Cite</a>
+      <a class="nav-cta" href="https://arxiv.org/abs/2512.02851" target="_blank" rel="noopener">
+        arXiv ↗
+      </a>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button class="nav-burger" id="navBurger" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<header class="hero" id="top">
+  <div class="container">
+    <div class="hero-badge reveal">
+      <span class="dot"></span>
+      Accepted &middot; IEEE Robotics and Automation Letters (RA-L) &middot; 2026
+    </div>
+    <h1 class="reveal">
+      <span class="grad">EmbodiedDiffusion</span><br/>
+      End-to-End Traversability-Guided Visual Diffusion<br/>
+      for Heterogeneous Robot Navigation
+    </h1>
+    <p class="hero-sub reveal">
+      A single diffusion model that <strong>predicts traversability and generates feasible trajectories</strong> from one RGB image —
+      prompt-free, real-time, and transferable across quadrupeds and aerial robots.
+    </p>
+    <p class="authors reveal">
+      <strong>Iana Zhura</strong>, <strong>Sausar Karaf</strong>, <strong>Faryal Batool</strong>,
+      <strong>Nipun Dhananjaya Weerakkodi Mudalige</strong>, <strong>Valerii Serpiva</strong>,
+      <strong>Ali Alridha Abdulkarim</strong>, <strong>Aleksey Fedoseev</strong>,
+      <strong>Didar Seyidov</strong>, <strong>Hajira Amjad</strong>, <strong>Dzmitry Tsetserukou</strong>
+    </p>
+    <p class="lab reveal">
+      Intelligent Space Robotics Laboratory &middot;
+      <a href="https://www.skoltech.ru/en/laboratories/intelligent-space-robotics-laboratory" target="_blank" rel="noopener">
+        Skolkovo Institute of Science and Technology
+      </a>
+    </p>
+    <div class="cta-row reveal">
+      <a class="btn btn-primary" href="https://arxiv.org/abs/2512.02851" target="_blank" rel="noopener">
+        Read on arXiv ↗
+      </a>
+      <a class="btn" href="https://arxiv.org/pdf/2512.02851" target="_blank" rel="noopener">
+        ⬇ Download PDF
+      </a>
+      <a class="btn" href="#video">▶ Watch Video</a>
+      <a class="btn" href="#cite">Cite</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Teaser ===== -->
+<section class="section" id="teaser">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Cross-Embodiment Teaser</div>
+      <h2>Same scene, different paths</h2>
+      <p class="section-lead">
+        A single visual backbone, modulated only by the robot's state vector, produces
+        platform-specific behavior. The quadruped routes <em>around</em> the gate.
+        The aerial robot flies <em>through</em> it.
+      </p>
+    </div>
+
+    <div class="figure-card reveal">
+      <img
+        src="images/teaser-web.jpg"
+        alt="Cross-embodiment traversability and trajectory generation. A shared visual backbone is conditioned on the robot state vector via FiLM, producing embodiment-specific behavior: the quadruped (blue) routes around the gate while the aerial robot (green) flies through it."
+        decoding="async"
+      />
+    </div>
+    <p class="figure-caption reveal">
+      <strong>Figure 1.</strong> Cross-embodiment traversability and trajectory generation from a
+      shared visual backbone. A single network conditioned on the robot state vector via
+      <em>FiLM</em> produces embodiment-specific behavior from the same RGB scene.
+    </p>
+  </div>
+</section>
+
+<!-- ===== Video ===== -->
+<section class="section" id="video" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Video</div>
+      <h2>Watch the system in action</h2>
+      <p class="section-lead">
+        See EmbodiedDiffusion running onboard a Unitree Go1 quadruped and a custom 8-inch quadrotor — 90&nbsp;ms inference, replanning every cycle.
+      </p>
+    </div>
+
+    <!--
+      TO EMBED YOUR VIDEO:
+      1. Upload to YouTube (unlisted or public).
+      2. Replace the entire <div class="video-placeholder">...</div> block below with:
+
+           <div class="video-frame">
+             <iframe
+               src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+               title="EmbodiedDiffusion demo"
+               frameborder="0"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+               allowfullscreen></iframe>
+           </div>
+
+      3. Delete the placeholder block. The .video-frame wrapper already handles 16:9
+         aspect ratio and rounded corners for you.
+    -->
+    <div class="video-frame reveal video-placeholder" aria-label="Demo video — coming soon">
+      <div class="video-overlay">
+        <div class="video-play" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="56" height="56">
+            <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+            <circle cx="32" cy="32" r="22" fill="rgba(124, 92, 255, 0.15)" stroke="currentColor" stroke-width="1.5"/>
+            <polygon points="27,21 27,43 45,32" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="video-text">
+          <div class="video-eyebrow">Demo Video</div>
+          <div class="video-title">Coming upon publication</div>
+          <div class="video-sub">Quadruped &amp; aerial deployment, real-time replanning, cross-embodiment transfer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Highlights ===== -->
+<section class="section" id="highlights" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">At a Glance</div>
+      <h2>The numbers that matter</h2>
+      <p class="section-lead">
+        A single network, prompt-free, real-time — and it transfers to a new robot with ten minutes of data.
+      </p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat reveal">
+        <div class="stat-value">90 ms</div>
+        <div class="stat-label">Real-time inference on edge hardware (Jetson Orin AGX)</div>
+      </div>
+      <div class="stat stat-2 reveal">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Up to 100% navigation success — 80–100% across every real-world scenario</div>
+      </div>
+      <div class="stat stat-3 reveal">
+        <div class="stat-value">~10 min</div>
+        <div class="stat-label">Visual data needed to adapt the model to a new robot platform</div>
+      </div>
+      <div class="stat stat-4 reveal">
+        <div class="stat-value">11.36</div>
+        <div class="stat-label">Average obstacle clearance (pixels) — vs 5.83 without embodiment conditioning</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Method ===== -->
+<section class="section" id="method">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Method</div>
+      <h2>Two components, one network</h2>
+      <p class="section-lead">
+        Distill VLM semantics into a lightweight student once. At deployment, the student runs
+        prompt-free, while a FiLM-conditioned diffusion UNet produces the trajectory in 20 denoising steps.
+      </p>
+    </div>
+
+    <div class="method-grid">
+      <div class="method-card reveal">
+        <div class="method-icon">①</div>
+        <h3>VLM Teacher → Compact Student</h3>
+        <p>AnyTraverse supplies embodiment-specific traversability maps as training targets. The student distills them once, offline — then runs prompt-free at 90 ms.</p>
+      </div>
+      <div class="method-card reveal">
+        <div class="method-icon g2">②</div>
+        <h3>FiLM Embodiment Conditioning</h3>
+        <p>The robot state vector modulates visual features channel-wise, so the same RGB scene yields platform-consistent traversability without per-platform models.</p>
+      </div>
+      <div class="method-card reveal">
+        <div class="method-icon g3">③</div>
+        <h3>Planner-Free Synthetic Supervision</h3>
+        <p>Smoothed Bezier paths between VLM-verified start–goal pairs supervise the diffusion UNet. The model learns the distribution of feasible trajectories — not memorized demos.</p>
+      </div>
+      <div class="method-card reveal">
+        <div class="method-icon g4">④</div>
+        <h3>Traversability Regularization</h3>
+        <p>𝓛<sub>trav</sub> concentrates denoising probability mass in visually safe regions — improving obstacle clearance by 26% over no-trav ablations.</p>
+      </div>
+    </div>
+
+    <div class="figure-card reveal" style="margin-top: 48px;">
+      <img
+        src="images/main-figure-web.png"
+        alt="Two-component framework. Left: AnyTraverse VLM teacher produces a dense traversability map from RGB and embodiment-specific prompts, supervising the student model via L_distil. Right: A frozen visual encoder is modulated by the robot state vector through FiLM conditioning, producing embodiment tokens Z_film and a predicted traversability map. Z_film conditions the diffusion UNet via cross-attention; the UNet denoises a trajectory sample over N=20 steps, conditioned on the trajectory heatmap overlay and predicted traversability map."
+        decoding="async"
+      />
+    </div>
+    <p class="figure-caption reveal">
+      <strong>Figure 2.</strong> The two-component framework. The teacher runs offline during training; the student runs prompt-free at 90 ms at deployment.
+    </p>
+  </div>
+</section>
+
+<!-- ===== Results ===== -->
+<section class="section" id="results">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Results</div>
+      <h2>Validated on real robots, real environments</h2>
+      <p class="section-lead">
+        Unitree Go1 quadruped and a custom 8-inch quadrotor. Five trials per scenario.
+        All inference runs onboard.
+      </p>
+    </div>
+
+    <h3 class="reveal" style="font-size: 18px; margin-top: 32px; margin-bottom: 12px; color: var(--text);">
+      Baseline Comparison across Heterogeneous Platforms
+    </h3>
+    <div class="t-wrap reveal">
+      <table class="results" aria-label="Baseline comparison across heterogeneous platforms">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Inference (ms) ↓</th>
+            <th>Clearance ↑</th>
+            <th>Safe<sub>min</sub> ↑</th>
+            <th>Safe<sub>max</sub> ↑</th>
+            <th>Success ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><td colspan="6">UAV — Aerial Robot</td></tr>
+          <tr>
+            <td>DTG (expert-supervised)</td>
+            <td class="num">240</td>
+            <td class="num">4.85</td>
+            <td class="num">0.26</td>
+            <td class="num">0.69</td>
+            <td class="num">60%</td>
+          </tr>
+          <tr>
+            <td>Potential Fields + VLM</td>
+            <td class="num">600</td>
+            <td class="num">3.56</td>
+            <td class="num">0.37</td>
+            <td class="num">0.29</td>
+            <td class="num">50%</td>
+          </tr>
+          <tr class="best">
+            <td><strong>EmbodiedDiffusion (Ours)</strong></td>
+            <td class="num"><strong>90</strong></td>
+            <td class="num"><strong>8.75</strong></td>
+            <td class="num"><strong>0.50</strong></td>
+            <td class="num"><strong>0.80</strong></td>
+            <td class="num"><strong>89%</strong></td>
+          </tr>
+          <tr class="group-row"><td colspan="6">UGV — Quadruped Robot</td></tr>
+          <tr>
+            <td>DTG (expert-supervised)</td>
+            <td class="num">240</td>
+            <td class="num">8.67</td>
+            <td class="num">0.55</td>
+            <td class="num">0.83</td>
+            <td class="num">75%</td>
+          </tr>
+          <tr>
+            <td>Potential Fields + VLM</td>
+            <td class="num">160</td>
+            <td class="num">10.31</td>
+            <td class="num">0.97</td>
+            <td class="num">0.90</td>
+            <td class="num">100%</td>
+          </tr>
+          <tr class="best">
+            <td><strong>EmbodiedDiffusion (Ours)</strong></td>
+            <td class="num"><strong>90</strong></td>
+            <td class="num"><strong>10.45</strong></td>
+            <td class="num"><strong>0.72</strong></td>
+            <td class="num"><strong>0.85</strong></td>
+            <td class="num"><strong>100%</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="reveal" style="font-size: 18px; margin-top: 48px; margin-bottom: 12px; color: var(--text);">
+      Real-World Deployment
+    </h3>
+    <div class="t-wrap reveal">
+      <table class="results" aria-label="Real-world deployment results">
+        <thead>
+          <tr>
+            <th>Experiment</th>
+            <th>Setting</th>
+            <th>Success ↑</th>
+            <th>Clearance (m) ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><td colspan="4">UGV — Data Efficiency (Unitree Go1)</td></tr>
+          <tr class="best">
+            <td>Quadruped</td><td>100% training data</td><td class="num"><strong>100%</strong></td><td class="num"><strong>1.19</strong></td>
+          </tr>
+          <tr class="best">
+            <td>Quadruped</td><td>50% training data</td><td class="num"><strong>100%</strong></td><td class="num">0.41</td>
+          </tr>
+          <tr>
+            <td>Quadruped</td><td>30% training data</td><td class="num">67%</td><td class="num">0.56</td>
+          </tr>
+          <tr class="group-row"><td colspan="4">UAV — Cross-Scene Generalization (Aerial)</td></tr>
+          <tr class="best">
+            <td>Aerial</td><td>Single gate (G)</td><td class="num"><strong>100%</strong></td><td class="num">0.45</td>
+          </tr>
+          <tr>
+            <td>Aerial</td><td>Sequential gates (2G)</td><td class="num">67%</td><td class="num">0.31</td>
+          </tr>
+          <tr class="best">
+            <td>Aerial</td><td>Gate + obstacle (GO)</td><td class="num"><strong>100%</strong></td><td class="num">0.40</td>
+          </tr>
+          <tr class="group-row"><td colspan="4">UAV — Simulation-to-Real Transfer</td></tr>
+          <tr class="best">
+            <td>Aerial (sim)</td><td>Five simulation scenarios</td><td class="num">80%</td><td class="num">0.33</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="reveal" style="font-size: 18px; margin-top: 48px; margin-bottom: 12px; color: var(--text);">
+      Ablation — Network Components (Quadruped)
+    </h3>
+    <div class="t-wrap reveal">
+      <table class="results" aria-label="Ablation of network components">
+        <thead>
+          <tr>
+            <th>Variant</th>
+            <th>Clearance ↑</th>
+            <th>Cost ↓</th>
+            <th>Safe<sub>min</sub> ↑</th>
+            <th>Safe<sub>max</sub> ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best">
+            <td><strong>Full model (Ours)</strong></td>
+            <td class="num"><strong>11.36</strong></td>
+            <td class="num"><strong>2.88</strong></td>
+            <td class="num"><strong>0.96</strong></td>
+            <td class="num"><strong>0.98</strong></td>
+          </tr>
+          <tr>
+            <td>No traversability input</td>
+            <td class="num">8.37</td>
+            <td class="num">3.42</td>
+            <td class="num">0.93</td>
+            <td class="num">0.98</td>
+          </tr>
+          <tr>
+            <td>No s<sub>g</sub> input</td>
+            <td class="num">11.26</td>
+            <td class="num">3.37</td>
+            <td class="num">0.95</td>
+            <td class="num">0.98</td>
+          </tr>
+          <tr>
+            <td>No conditional embedding</td>
+            <td class="num">5.83</td>
+            <td class="num">5.34</td>
+            <td class="num">0.90</td>
+            <td class="num">0.97</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="figure-caption reveal" style="margin-top: 16px;">
+      <strong>Insight.</strong> Disabling conditional embedding causes the largest single drop — clearance falls
+      49% (11.36 → 5.83), proving that embodiment-aware conditioning is what makes the same backbone behave
+      correctly as both a quadruped and a drone.
+    </p>
+  </div>
+</section>
+
+<!-- ===== Why it matters ===== -->
+<section class="section" id="why" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Why It Matters</div>
+      <h2>One model, many robots, zero prompts</h2>
+    </div>
+    <div class="method-grid">
+      <div class="method-card reveal">
+        <div class="method-icon">⚡</div>
+        <h3>Prompt-free at deployment</h3>
+        <p>The VLM teacher is distilled once. The student never needs per-scene, per-embodiment prompt tuning at runtime — a prohibitive cost for real fleets.</p>
+      </div>
+      <div class="method-card reveal">
+        <div class="method-icon g2">🦾</div>
+        <h3>Embodied by design</h3>
+        <p>The same scene produces routes that go around narrow gates (quadruped) or through them (drone) — purely from FiLM state conditioning.</p>
+      </div>
+      <div class="method-card reveal">
+        <div class="method-icon g3">⏱</div>
+        <h3>Real-time & adaptive</h3>
+        <p>90 ms inference enables continuous replanning. Adapting to a new platform takes ~10 min of visual data — not a full retrain.</p>
+      </div>
+      <div class="method-card reveal">
+        <div class="method-icon g4">🧠</div>
+        <h3>Distributes, not memorizes</h3>
+        <p>Planner-free synthetic supervision teaches the distribution of feasible paths — so the model generalizes to gates it has never seen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Code & Dataset ===== -->
+<section class="section" id="resources" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Code &amp; Dataset</div>
+      <h2>Open source, releasing soon</h2>
+      <p class="section-lead">
+        All code, the trained model weights, the ROS&nbsp;2 navigation stack, and the Unity simulation
+        environment are <strong>releasing soon</strong>.
+      </p>
+    </div>
+
+    <div class="resources-grid">
+      <!-- Code card -->
+      <div class="resource-card reveal">
+        <div class="resource-head">
+          <div class="resource-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.73-1.53-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.68.8.56C20.22 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
+            </svg>
+          </div>
+          <span class="badge badge-pending">Coming soon</span>
+        </div>
+        <h3>Code &amp; ROS&nbsp;2 Stack</h3>
+        <p>Full PyTorch implementation, the FiLM-conditioned diffusion UNet, the traversability student model, and the complete ROS&nbsp;2 navigation node for both Unitree Go1 and the custom quadrotor.</p>
+        <ul class="resource-list">
+          <li>Training &amp; inference scripts</li>
+          <li>ROS&nbsp;2 navigation package</li>
+          <li>Unity UAV simulation environment</li>
+          <li>Pre-trained weights (drone + quadruped)</li>
+        </ul>
+        <div class="resource-cta-row">
+          <a class="btn btn-disabled" aria-disabled="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.73-1.53-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.68.8.56C20.22 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+            GitHub repo (pending)
+          </a>
+        </div>
+      </div>
+
+      <!-- Dataset card -->
+      <div class="resource-card reveal">
+        <div class="resource-head">
+          <div class="resource-icon g2" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <path d="M4 7h6V3H4a1 1 0 0 0-1 1v2zm0 4h6V9H4v2zm0 4h6v-2H4v2zm0 4h6v-2H4v2zm10 2h6a1 1 0 0 0 1-1v-2h-7v3zm7-4h-7v-2h7v2zm0-4h-7V9h7v2zm0-4h-7V5a1 1 0 0 0-1-1h-2v8h10V5a1 1 0 0 0-1-1z"/>
+            </svg>
+          </div>
+          <span class="badge badge-pending">Coming soon</span>
+        </div>
+        <h3>Dataset &amp; Simulation</h3>
+        <p>The full multi-embodiment dataset used for VLM distillation and the synthetic-trajectory pipeline, plus the Unity simulation scenes used for sim-to-real UAV validation.</p>
+        <ul class="resource-list">
+          <li>~4,000 RGB frames per platform (10&nbsp;min collection)</li>
+          <li>AnyTraverse traversability heatmaps</li>
+          <li>Synthetic start–goal trajectory pairs</li>
+          <li>Unity indoor scenes (5 sim scenarios)</li>
+        </ul>
+        <div class="resource-cta-row">
+          <a class="btn btn-disabled" aria-disabled="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 15l-5-5 1.41-1.41L11 14.17l5.59-5.58L18 10l-7 7z"/></svg>
+            Dataset (pending)
+          </a>
+          <a class="btn btn-disabled" aria-disabled="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2L2 7v6c0 5 4.5 9.5 10 11 5.5-1.5 10-6 10-11V7l-10-5z"/></svg>
+            Sim env (pending)
+          </a>
+        </div>
+      </div>
+
+      <!-- arXiv / Paper card -->
+      <div class="resource-card reveal">
+        <div class="resource-head">
+          <div class="resource-icon g3" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+          </div>
+          <span class="badge badge-live">Available now</span>
+        </div>
+        <h3>Paper</h3>
+        <p>The IEEE RA-L 2026 paper is available on arXiv. Cite the work, or grab the PDF for offline reading.</p>
+        <ul class="resource-list">
+          <li>arXiv preprint:&nbsp;2512.02851</li>
+          <li>Accepted to IEEE RA-L 2026</li>
+          <li>Category: cs.RO (Robotics)</li>
+        </ul>
+        <div class="resource-cta-row">
+          <a class="btn btn-primary" href="https://arxiv.org/abs/2512.02851" target="_blank" rel="noopener">
+            Read on arXiv ↗
+          </a>
+          <a class="btn" href="https://arxiv.org/pdf/2512.02851" target="_blank" rel="noopener">
+            ⬇ PDF
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Citation ===== -->
+<section class="section" id="cite" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Citation</div>
+      <h2>Use this in your work</h2>
+      <p class="section-lead">
+        If you find this work useful, please cite the <a href="https://arxiv.org/abs/2512.02851" target="_blank" rel="noopener">arXiv preprint</a>. The IEEE RA-L DOI will be added once the paper appears in print.
+      </p>
+    </div>
+
+    <div class="bibtex-card reveal" id="bibtex">
+<button class="copy-btn" onclick="copyBibtex()">Copy</button><span class="k">@misc</span>{<span class="k">zhura2026embodieddiffusionendtoendtraversabilityguidedvisual</span>,
+  <span class="k">title</span>={<span class="v">EmbodiedDiffusion: End-to-End Traversability-Guided Visual Diffusion for Heterogeneous Robot Navigation</span>},
+  <span class="k">author</span>={<span class="v">Zhura, Iana and Karaf, Sausar and Batool, Faryal and Weerakkodi Mudalige, Nipun Dhananjaya and Serpiva, Valerii and Abdulkarim, Ali Alridha and Fedoseev, Aleksey and Seyidov, Didar and Amjad, Hajira and Tsetserukou, Dzmitry</span>},
+  <span class="k">year</span>={<span class="v">2026</span>},
+  <span class="k">eprint</span>={<span class="v">2512.02851</span>},
+  <span class="k">archivePrefix</span>={<span class="v">arXiv</span>},
+  <span class="k">primaryClass</span>={<span class="v">cs.RO</span>},
+  <span class="k">url</span>={<span class="v">https://arxiv.org/abs/2512.02851</span>}
+}</div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-lab reveal">
+      🤖 Intelligent Space Robotics Laboratory
+    </div>
+    <p class="reveal">
+      <a href="https://www.skoltech.ru/en/laboratories/intelligent-space-robotics-laboratory" target="_blank" rel="noopener">
+        Skolkovo Institute of Science and Technology (Skoltech)
+      </a>
+    </p>
+    <p class="reveal">
+      &copy; 2026 The Authors. Paper accepted to IEEE Robotics and Automation Letters.
+    </p>
+    <p class="reveal" style="margin-top: 16px; font-size: 12px;">
+      arXiv:2512.02851 &middot; Code, dataset, and simulation environments are releasing soon.
+    </p>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Copy bibtex
+  function copyBibtex() {
+    const card = document.querySelector('.bibtex-card');
+    // grab just the bibtex text (without the button text)
+    const clone = card.cloneNode(true);
+    const btn = clone.querySelector('.copy-btn');
+    if (btn) btn.remove();
+    const text = clone.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const b = card.querySelector('.copy-btn');
+      const old = b.textContent;
+      b.textContent = '✓ Copied';
+      b.style.background = 'rgba(94, 240, 161, 0.2)';
+      b.style.borderColor = 'rgba(94, 240, 161, 0.5)';
+      setTimeout(() => { b.textContent = old; b.style.background = ''; b.style.borderColor = ''; }, 1800);
+    });
+  }
+
+  // Theme toggle (dark <-> light), persists in localStorage
+  (function () {
+    const root = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+  })();
+
+  // Mobile hamburger dropdown
+  (function () {
+    const burger = document.getElementById('navBurger');
+    const links = document.getElementById('navLinks');
+    if (!burger || !links) return;
+    const setOpen = (open) => {
+      links.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      burger.classList.toggle('active', open);
+    };
+    burger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(!links.classList.contains('open'));
+    });
+    // close when a link is clicked
+    links.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') setOpen(false);
+    });
+    // close on click outside
+    document.addEventListener('click', (e) => {
+      if (!links.classList.contains('open')) return;
+      if (!links.contains(e.target) && !burger.contains(e.target)) setOpen(false);
+    });
+    // close on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+    });
+  })();
+</script>
+
+</body>
+</html>
